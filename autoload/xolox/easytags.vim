@@ -120,7 +120,9 @@ function! xolox#easytags#update(silent, filter_tags, filenames) " {{{2
     " Phase #2: Update the tags asynchronously in a background process.
     call xolox#easytags#call_remote('xolox#easytags#update_remote', [context])
     " Report to the user what's happening.
-    call xolox#misc#timer#force("easytags.vim %s: Started asynchronous tag update in %s ..", g:xolox#easytags#version, starttime)
+    if &vbs >= 1
+      call xolox#misc#timer#force("easytags.vim %s: Started asynchronous tag update in %s ..", g:xolox#easytags#version, starttime)
+    endif
   catch
     call xolox#misc#msg#warn("easytags.vim %s: %s (at %s)", g:xolox#easytags#version, v:exception, v:throwpoint)
     return {}
@@ -741,13 +743,15 @@ function! xolox#easytags#remote_callback(context) " {{{2
         call xolox#misc#msg#info("easytags.vim %s: Relaying message from other side: %s", g:xolox#easytags#version, message)
       endfor
     endif
-    " Let the user know what happened.
-    let msg = "easytags.vim %s: Finished asynchronous tag update in %s (wrote %i tags to %s)."
-    call xolox#misc#timer#force(msg,
-          \ g:xolox#easytags#version,
-          \ a:context['starttime'],
-          \ a:context['tags_written'],
-          \ fnamemodify(a:context['tagsfile'], ':~'))
+    if &vbs >= 1
+      " Let the user know what happened.
+      let msg = "easytags.vim %s: Finished asynchronous tag update in %s (wrote %i tags to %s)."
+      call xolox#misc#timer#force(msg,
+            \ g:xolox#easytags#version,
+            \ a:context['starttime'],
+            \ a:context['tags_written'],
+            \ fnamemodify(a:context['tagsfile'], ':~'))
+    endif
   endif
 endfunction
 
