@@ -168,6 +168,11 @@ augroup PluginEasyTags
   " After reloading a buffer the dynamic syntax highlighting is lost. The
   " following code makes sure the highlighting is refreshed afterwards.
   autocmd BufReadPost * unlet! b:easytags_last_highlighted
+  " During :vimgrep, each searched buffer triggers an asynchronous tag update,
+  " resulting in races for the tags file. Temporarily disable the automatic
+  " updates during this.
+  autocmd QuickFixCmdPre  *vimgrep* let g:easytags_auto_disabled = 1
+  autocmd QuickFixCmdPost *vimgrep* let g:easytags_auto_disabled = 0
 augroup END
 
 " }}}1
